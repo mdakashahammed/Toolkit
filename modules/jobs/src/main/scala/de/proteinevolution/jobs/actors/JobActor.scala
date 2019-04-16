@@ -89,6 +89,8 @@ class JobActor @Inject()(
   // Running executions
   @volatile private var runningExecutions: Map[String, RunningExecution] = Map.empty
 
+
+  // TODO
   private def getCurrentJob(jobID: String): Future[Option[Job]] = {
     // Check if the job is still in the current jobs.
     currentJobs.get(jobID) match {
@@ -109,6 +111,7 @@ class JobActor @Inject()(
     }
   }
 
+  // TODO
   private def getCurrentExecutionContext(jobID: String): Option[ExecutionContext] = {
     currentExecutionContexts.get(jobID) match {
       case Some(executionContext) => Some(executionContext)
@@ -123,6 +126,8 @@ class JobActor @Inject()(
     }
   }
 
+
+  // TODO check
   private def validatedParameters(
       job: Job,
       runscript: Runscript,
@@ -130,9 +135,19 @@ class JobActor @Inject()(
   ): Seq[(String, (Evaluation, Option[Argument]))] = {
     // Representation of the current State of the job submission
 
-    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-    // TODO Check parameters for validity here!!!             TODO
-    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+    def supply(
+        jobID: String,
+        name: String,
+        value: String,
+        params: Seq[(String, (Runscript.Evaluation, Option[Argument]))]
+    ): Seq[(String, (Runscript.Evaluation, Option[Argument]))] = {
+      params.map {
+        case (paramName, (evaluation, _)) if paramName == name =>
+          val x = Some(evaluation(RString(value), currentExecutionContexts(jobID)))
+          (name, (evaluation, x))
+        case q => q
+      }
+    }
 
     var validParameters: Seq[(String, (Evaluation, Option[Argument]))] =
       runscript.parameters.map(t => t._1 -> (t._2 -> Some(ValidArgument(new LiteralRepresentation(RString("false"))))))
@@ -142,19 +157,7 @@ class JobActor @Inject()(
     validParameters
   }
 
-  private def supply(
-      jobID: String,
-      name: String,
-      value: String,
-      params: Seq[(String, (Runscript.Evaluation, Option[Argument]))]
-  ): Seq[(String, (Runscript.Evaluation, Option[Argument]))] = {
-    params.map {
-      case (paramName, (evaluation, _)) if paramName == name =>
-        val x = Some(evaluation(RString(value), currentExecutionContexts(jobID)))
-        (name, (evaluation, x))
-      case q => q
-    }
-  }
+
 
   private def removeJob(jobID: String): Unit = {
     // Save Job Event Log to the collection and remove it from the map afterwards
@@ -232,13 +235,13 @@ class JobActor @Inject()(
           }
           job
         }
-
   }
 
   private def isComplete(params: Seq[(String, (Runscript.Evaluation, Option[Argument]))]): Boolean = {
     // If we have an argument for all parameters, we are done
     params.forall(item => item._2._2.isDefined)
   }
+
 
   private def sendJobUpdateMail(job: Job): Boolean = {
     if (job.emailUpdate && job.ownerID.isDefined) {
@@ -318,7 +321,6 @@ class JobActor @Inject()(
           // TODO Implement Me. This specifies what the JobActor should do
           // TODO when not all parameters have been specified or when they are invalid
           log.error("[JobActor.PrepareJob] The job " + job.jobID + " has invalid or missing parameters.")
-          self ! JobStateChanged(job.jobID, Error)
         }
       } catch {
         case FileAlreadyExists(_) =>
@@ -329,9 +331,16 @@ class JobActor @Inject()(
           self ! JobStateChanged(job.jobID, Error)
       }
 
+
+
+
     // Checks the jobHashDB for matches and generates one for the job if there are none.
     case CheckJobHashes(jobID) =>
+
+
       log.info(s"[JobActor[$jobActorNumber].CheckJobHashes] Job with jobID $jobID will now be hashed.")
+
+
       getCurrentJob(jobID).foreach {
         case Some(job) =>
           getCurrentExecutionContext(jobID) match {
@@ -360,6 +369,9 @@ class JobActor @Inject()(
           }
         case None => NotUsed
       }
+
+
+
 
     case Delete(jobID, userIDOption) =>
       val verbose = true // just switch this on / off for logging
@@ -392,6 +404,7 @@ class JobActor @Inject()(
           case None => NotUsed
         }
 
+    // TODO was macht das hier?
     case CheckIPHash(jobID) =>
       getCurrentJob(jobID).foreach {
         case Some(job) =>
@@ -609,16 +622,6 @@ class JobActor @Inject()(
         if ((!job.isFinished && !jobInCluster) || isOverDue(job) || sgeFailed(clusterData.sgeID, qStat))
           self ! JobStateChanged(job.jobID, Error)
       }
-
-    // Sets the cluster job ID for a job
-    case SetSGEID(jobID: String, sgeID: String) =>
-      jobDao
-        .modifyJob(BSONDocument(Job.JOBID -> jobID), BSONDocument("$set" -> BSONDocument(Job.SGEID -> sgeID)))
-        .foreach {
-          case Some(job) =>
-            currentJobs = currentJobs.updated(job.jobID, job)
-          case None => NotUsed
-        }
 
     case UpdateLog =>
       currentJobs.foreach { job =>

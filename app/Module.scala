@@ -15,10 +15,13 @@
  */
 
 import com.google.inject.AbstractModule
+import de.proteinevolution.jobs.background.{ JobWorkerQueue, QueueWorker }
 import services.{ Configuration, ConfigurationImpl }
 
 class Module extends AbstractModule {
   override def configure(): Unit = {
     bind(classOf[Configuration]).to(classOf[ConfigurationImpl]).asEagerSingleton()
+    bind(classOf[QueueWorker]).asEagerSingleton()
+    bind(classOf[JobWorkerQueue]).asEagerSingleton()
   }
 }

@@ -16,16 +16,22 @@
 
 package de.proteinevolution.base.helpers
 
+import reactivemongo.bson.{ BSONDocument, BSONElement, Producer }
+
 import scala.concurrent.Future
 
 trait ToolkitTypes {
 
+  type BDOC = BSONDocument
+
   type Fu[A] = Future[A]
+
+  @inline def bdoc(elements: Producer[BSONElement]*): BDOC = BSONDocument(elements: _*)
 
   @inline def fuccess[A](a: A): Fu[A] = Future.successful(a)
 
   implicit class ToFutureSuccessful[T](obj: T) {
-    @inline def asFuture: Future[T] = Future.successful(obj)
+    @inline def asFuture: Fu[T] = Future.successful(obj)
   }
 
 }

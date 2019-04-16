@@ -29,7 +29,7 @@ import scala.util.matching.Regex
 class ConstantsV2 @Inject()(config: Configuration) {
 
   /** Number of jobActors */
-  final val nJobActors: Int = 100
+  final val nJobActors: Int = 32
 
   /** Key for the Modeller tool */
   final val modellerKey: String = config.get[String]("modeller_key")
