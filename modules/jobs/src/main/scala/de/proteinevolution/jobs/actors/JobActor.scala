@@ -81,6 +81,11 @@ class JobActor @Inject()(
   @volatile private var currentExecutionContexts: Map[String, ExecutionContext] = Map.empty[String, ExecutionContext]
 
   private val fetchLatestInterval = 500 millis
+
+
+  // TODO can we do without long polling? If so, it would be nice
+  // 2nd TODO can we possibly do without the internal maps? only use the database?
+
   private val Tick: Cancellable = {
     // scheduler should use the system dispatcher
     context.system.scheduler.schedule(Duration.Zero, fetchLatestInterval, self, UpdateLog)(context.system.dispatcher)
@@ -404,7 +409,7 @@ class JobActor @Inject()(
           case None => NotUsed
         }
 
-    // TODO was macht das hier?
+    // TODO was macht das hier? // checkt ob ein quota limit erreicht ist
     case CheckIPHash(jobID) =>
       getCurrentJob(jobID).foreach {
         case Some(job) =>

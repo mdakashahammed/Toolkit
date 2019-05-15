@@ -26,26 +26,18 @@ import de.proteinevolution.tel.Observer
 @Singleton
 class TELEnv extends Env with Observer[EnvFile] {
 
-  @volatile private var env: Map[String, String] = Map.empty
-
-  override def get(key: String): String = this.env(key)
-
-  override def configure(key: String, value: String): Unit = {
-    this.env = this.env + (key -> value)
-  }
-
-  override def remove(key: String): Unit = {
-    this.env -= key
-  }
+  @volatile private var env: Map[String, String]                   = Map.empty
+  @inline override def get(key: String): String                    = this.env(key)
+  @inline override def configure(key: String, value: String): Unit = env = env + (key -> value)
+  @inline override def remove(key: String): Unit                   = env -= key
 
   override def receiveInitial(subject: EnvFile): Unit = receiveUpdate(subject)
 
   override def receiveUpdate(subject: EnvFile): Unit = {
-
     // If the Environmental file triggers a change, reload it and add new variables to the
     // env
     subject.load.foreach { kv =>
-      this.env = this.env + kv
+      env = env + kv
     }
   }
 

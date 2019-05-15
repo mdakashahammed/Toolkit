@@ -37,7 +37,7 @@ import reactivemongo.bson.BSONDocument
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-final class JobDispatcher @Inject()(
+final class JobCreateService @Inject()(
     jobDao: JobDao,
     constants: ConstantsV2,
     jobIdProvider: JobIdProvider,

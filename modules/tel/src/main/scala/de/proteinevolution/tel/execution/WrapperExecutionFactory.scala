@@ -16,17 +16,13 @@
 
 package de.proteinevolution.tel.execution
 
-import javax.inject.{ Inject, Named, Singleton }
-import better.files._
-import de.proteinevolution.tel.TELRegex
 import java.nio.file.attribute.PosixFilePermission
 
+import better.files._
+import de.proteinevolution.tel.TELRegex
 import de.proteinevolution.tel.env.Env
-import de.proteinevolution.tel.execution.WrapperExecutionFactory.{
-  PendingExecution,
-  RegisteredExecution,
-  RunningExecution
-}
+import de.proteinevolution.tel.execution.WrapperExecutionFactory.{ PendingExecution, RegisteredExecution, RunningExecution }
+import javax.inject.{ Inject, Named, Singleton }
 
 import scala.sys.process.Process
 
@@ -45,9 +41,11 @@ class WrapperExecutionFactory @Inject()(@Named("wrapperPath") wrapperPath: Strin
   // Accept the content of a runscript and used the Wrapper script to produce the Registered Execution
   // One might offer different Methods to create a Pending Execution to avoid the need to pass the content
   // of the Runscript directly as String
+
   def getInstance(content: String): PendingExecution = {
 
     val register = { file: File =>
+
       val runscript = (file / "runscript.sh").write(content)
       runscript.setPermissions(filePermissions)
 
@@ -76,6 +74,8 @@ class WrapperExecutionFactory @Inject()(@Named("wrapperPath") wrapperPath: Strin
         }
         RunningExecution(terminate)
       }
+
+
       RegisteredExecution(run)
     }
     PendingExecution(register)

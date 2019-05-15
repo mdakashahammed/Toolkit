@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext
 class SubmissionController @Inject()(
     jobActorAccess: JobActorAccess,
     userSessions: UserSessions,
-    jobDispatcher: JobDispatcher,
+    jobDispatcher: JobCreateService,
     cc: ControllerComponents,
     jobDao: JobDao,
     toolConfig: ToolConfig,

@@ -11,6 +11,9 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 
 // TODO move to the UPDATESERVICE
+// find out about the way TEL is called and used
+// after that we can replace tel with a much more concise
+// version, which is called tel2 -- but first get rid of the job actor
 
 @Singleton
 final class BackgroundService @Inject()(

@@ -31,4 +31,5 @@ class ParamCollector extends Params {
   def addParam(name: String, param: GenerativeParam): Unit = {
     generativeParams = generativeParams + (name -> param)
   }
+
 }

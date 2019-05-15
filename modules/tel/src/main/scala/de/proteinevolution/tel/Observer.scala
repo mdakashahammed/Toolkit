@@ -16,10 +16,6 @@
 
 package de.proteinevolution.tel
 
-/**
- * Stuff for the observer pattern
- *
- */
 trait Observer[S] {
   def receiveUpdate(subject: S): Unit
   def receiveInitial(subject: S): Unit

@@ -49,7 +49,7 @@ final class ClusterSubscriber @Inject()(constants: ConstantsV2)(
 
   private[this] def calculated(runningJobs: Int): Double = runningJobs.toDouble / constants.loadPercentageMarker
 
-  private[this] def active(runningJobs: Int): Receive = {
+  private[this] def active(runningJobs: Int): Receive = LoggingReceive {
 
     case SGELoad.Ask => sender ! UpdateLoad(calculated(runningJobs))
 
@@ -85,7 +85,7 @@ final class ClusterSubscriber @Inject()(constants: ConstantsV2)(
     }
   }
 
-  override def receive: Receive = LoggingReceive {
+  override def receive: Receive = {
     active(0)
   }
 

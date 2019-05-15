@@ -19,8 +19,8 @@ final class JobWorkerQueue @Inject()(applicationLifecycle: ApplicationLifecycle)
 
   private[this] val (queue, pub) = Source
     .queue[JobWorkerEvent](10000, OverflowStrategy.backpressure)
-    .withAttributes(ActorAttributes.supervisionStrategy { throwable =>
-      logger.error("JobWorkerQueue crashed", throwable)
+    .withAttributes(ActorAttributes.supervisionStrategy { t =>
+      logger.error("JobWorkerQueue crashed", t)
       Supervision.Resume
     })
     .toMat(Sink.asPublisher(fanout = false))(Keep.both)
